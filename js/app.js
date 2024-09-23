@@ -1,10 +1,17 @@
+
+// class to keep track of our calories 
 class CalorieTracker {
   constructor() {
+
+    //private objects 
     this._calorieLimit = Storage.getCalorieLimit();
     this._totalCalories = Storage.getTotalCalories(0);
     this._meals = Storage.getMeals();
     this._workouts = Storage.getWorkouts();
 
+
+    //private methods that cant be accessed by user outside this class(CalorieTracker)
+    // The constructor will run these classes when we instantiate them so don't forget
     this._displayCaloriesLimit();
     this._displayCaloriesTotal();
     this._displayCaloriesConsumed();
@@ -15,18 +22,22 @@ class CalorieTracker {
     document.getElementById('limit').value = this._calorieLimit;
   }
 
-  // Public Methods/API //
+  //-------------------------------------- Public Methods ----------------------------------
 
+  // takes meal object 
   addMeal(meal) {
+    // pushing to meal object 
     this._meals.push(meal);
     this._totalCalories += meal.calories;
     Storage.updateTotalCalories(this._totalCalories);
     Storage.saveMeal(meal);
     this._displayNewMeal(meal);
+    // render to view the change 
     this._render();
   }
 
   addWorkout(workout) {
+    // pushing to our workout array
     this._workouts.push(workout);
     this._totalCalories -= workout.calories;
     Storage.updateTotalCalories(this._totalCalories);
@@ -81,9 +92,10 @@ class CalorieTracker {
     this._workouts.forEach((workout) => this._displayNewWorkout(workout));
   }
 
-  // Private Methods //
+  //----------------------------------- Private Methods ----------------------------------
 
   _displayCaloriesTotal() {
+    // getting the element from our html to display the correct calories
     const totalCaloriesEl = document.getElementById('calories-total');
     totalCaloriesEl.innerHTML = this._totalCalories;
   }
@@ -94,8 +106,11 @@ class CalorieTracker {
   }
 
   _displayCaloriesConsumed() {
+    // get the element where we want to display it 
     const caloriesConsumedEl = document.getElementById('calories-consumed');
 
+    // reducer method. Basically it looping through all the meals and going to get the 
+    // total of all meal calories ( (accumulator, currentValue) => accumulator, currentValue, initialValue)
     const consumed = this._meals.reduce(
       (total, meal) => total + meal.calories,
       0
@@ -104,6 +119,7 @@ class CalorieTracker {
     caloriesConsumedEl.innerHTML = consumed;
   }
 
+  // same process as calories consumed 
   _displayCaloriesBurned() {
     const caloriesBurnedEl = document.getElementById('calories-burned');
 
@@ -116,13 +132,16 @@ class CalorieTracker {
   }
 
   _displayCaloriesRemaining() {
+    // getting the DOM elements 
     const caloriesRemainingEl = document.getElementById('calories-remaining');
     const progressEl = document.getElementById('calorie-progress');
 
+    // calculating the remaining calories 
     const remaining = this._calorieLimit - this._totalCalories;
 
     caloriesRemainingEl.innerHTML = remaining;
 
+    // adding styling depending on remaining calories 
     if (remaining <= 0) {
       caloriesRemainingEl.parentElement.parentElement.classList.remove(
         'bg-light'
@@ -197,6 +216,7 @@ class CalorieTracker {
     workoutsEl.appendChild(workoutEl);
   }
 
+  // all the stuff that should change in the UI
   _render() {
     this._displayCaloriesTotal();
     this._displayCaloriesConsumed();
@@ -206,14 +226,18 @@ class CalorieTracker {
   }
 }
 
+
+// creating a meal class 
 class Meal {
   constructor(name, calories) {
+    // always create an id to identify each meal by creating a random number
     this.id = Math.random().toString(16).slice(2);
     this.name = name;
     this.calories = calories;
   }
 }
 
+// creating a workout class with a unique id 
 class Workout {
   constructor(name, calories) {
     this.id = Math.random().toString(16).slice(2);
